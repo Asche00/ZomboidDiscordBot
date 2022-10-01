@@ -84,7 +84,7 @@ namespace ZomboidDiscordBot
             _client.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
             // Subscribe to slash command log events
             commands.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
-            _ = HandleStatus();
+            _ = HandleStatus(provider);
 
             _client.Ready += async () =>
             {
@@ -108,7 +108,7 @@ namespace ZomboidDiscordBot
         private async Task HandleStatus(IServiceProvider provider)
         {
             ServerUtility serverUtility = provider.GetRequiredService<ServerUtility>();
-                await serverUtility.QueryServerInfo();
+            serverUtility.QueryServerInfo();
         }
 
             static bool IsDebug()

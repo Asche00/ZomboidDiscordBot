@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Player = SteamQueryNet.Models.Player;
 using Discord.WebSocket;
 using Discord;
+using Microsoft.Extensions.Logging;
 
 namespace ZomboidDiscordBot.Server
 {
@@ -21,11 +22,14 @@ namespace ZomboidDiscordBot.Server
     {
         private readonly IConfigurationRoot _config;
         private readonly DiscordSocketClient _client;
+        private CancellationTokenSource? updateStatusCts;
+        private static Logger _logger;
 
-        public ServerUtility(IConfigurationRoot config, DiscordSocketClient client)
+        public ServerUtility(IConfigurationRoot config, DiscordSocketClient client, ConsoleLogger logger)
         {
             _config = config;
             _client = client;
+            _logger = logger;
         }
 
         public async Task RestartServerRcon()
@@ -44,25 +48,31 @@ namespace ZomboidDiscordBot.Server
 
         public async Task QueryServerInfo()
         {
-            string serverIp = _config["serverinfo:serverip"].ToString();
-            ushort serverPort = Convert.ToUInt16(_config["serverinfo:serverport"]);
-            IServerQuery serverQuery = new SteamQueryNet.ServerQuery();
-
-            try
+            updateStatusCts = new();
+            while (!updateStatusCts.IsCancellationRequested)
             {
-                serverQuery.Connect(serverIp, serverPort);
-            }
-            catch
-            {
-                await _client.SetActivityAsync(new Game("Offline")).ConfigureAwait(false);
-                return;
-            }
+                string serverIp = _config["serverinfo:serverip"].ToString();
+                ushort serverPort = Convert.ToUInt16(_config["serverinfo:serverport"]);
+                IServerQuery serverQuery = new SteamQueryNet.ServerQuery();
 
-            ServerInfo serverInfo = serverQuery.GetServerInfo();
-            List<Player> players = serverQuery.GetPlayers();
+                try
+                {
+                    serverQuery.Connect(serverIp, serverPort);
+                }
+                catch
+                {
+                    await _client.SetActivityAsync(new Game("Offline")).ConfigureAwait(false);
+                    return;
+                }
 
-            await _client.SetActivityAsync(new Game($"Zomboid with {players.Count()} players")).ConfigureAwait(false);
-            return;
+                //ServerInfo serverInfo = serverQuery.GetServerInfo();
+                List<Player> players = serverQuery.GetPlayers();
+
+                await _client.SetActivityAsync(new Game($"Zomboid with {players.Count()} players")).ConfigureAwait(false);
+                await _logger.Log(new LogMessage(LogSeverity.Info, $"Players: {players.Count()}", null));
+
+                await Task.Delay(TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+            }
 
         }
 
