@@ -66,7 +66,7 @@ namespace ZomboidDiscordBot
         {
             //Do RCON stuff here
             var ServerUtil = _services.GetRequiredService<ServerUtility>();
-            await ServerUtil.RestartServerRcon();
+            ServerUtil.RestartServerRcon();
 
 
             //Save to config file for application restarts

@@ -7,16 +7,24 @@ using ZomboidDiscordBot.Log;
 using CoreRCON;
 using CoreRCON.Parsers.Standard;
 using System.Net;
+using SteamQueryNet;
+using SteamQueryNet.Interfaces;
+using SteamQueryNet.Models;
+using Microsoft.Extensions.Hosting;
+using Player = SteamQueryNet.Models.Player;
+using Discord.WebSocket;
 
 namespace ZomboidDiscordBot.Server
 {
     public class ServerUtility
     {
         private readonly IConfigurationRoot _config;
+        private readonly DiscordSocketClient _client;
 
-        public ServerUtility(IConfigurationRoot config)
+        public ServerUtility(IConfigurationRoot config, DiscordSocketClient client)
         {
             _config = config;
+            _client = client;
         }
 
         public async Task RestartServerRcon()
@@ -32,5 +40,31 @@ namespace ZomboidDiscordBot.Server
 
             string response = await rcon.SendCommandAsync("quit");
         }
+
+        public async Task QueryServerInfo()
+        {
+            string serverIp = _config["serverinfo:serverip"].ToString();
+            ushort serverPort = Convert.ToUInt16(_config["serverinfo:serverport"]);
+            IServerQuery serverQuery = new SteamQueryNet.ServerQuery();
+
+            try
+            {
+                serverQuery.Connect(serverIp, serverPort);
+            }
+            catch
+            {
+                await _client.SetGameAsync ("Offline");
+                return;
+            }
+
+            ServerInfo serverInfo = serverQuery.GetServerInfo();
+            List<Player> players = serverQuery.GetPlayers();
+
+            await _client.SetGameAsync($"Online - Players: {players.Count()}");
+            return;
+
+        }
+
+
     }
 }
