@@ -57,11 +57,13 @@ namespace ZomboidDiscordBot.Server
 
                 try
                 {
+                    await _logger.Log(new LogMessage(LogSeverity.Debug, $"Querying server", null));
                     serverQuery.Connect(serverIp, serverPort);
                 }
                 catch
                 {
                     await _client.SetActivityAsync(new Game("Offline")).ConfigureAwait(false);
+                    await _logger.Log(new LogMessage(LogSeverity.Info, $"Server offline", null));
                     return;
                 }
 
