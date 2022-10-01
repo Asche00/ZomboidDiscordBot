@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration.Yaml;
 using Discord.Commands;
 using Discord;
 using ZomboidDiscordBot.Server;
+using System.IO;
 
 namespace ZomboidDiscordBot
 {
@@ -21,11 +22,17 @@ namespace ZomboidDiscordBot
 
         public async Task MainAsync()
         {
+            //We'll use the roaming directory for ease of use.
+            string configfilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZomboidBot");
+            if (!Directory.Exists(configfilePath))
+                Directory.CreateDirectory(configfilePath);
+            configfilePath = Path.Combine(configfilePath, "config.yml");
+
             var config = new ConfigurationBuilder()
             // this will be used more later on
             .SetBasePath(AppContext.BaseDirectory)
             // I chose using YML files for my config data as I am familiar with them
-            .AddYamlFile("config.yml")
+            .AddYamlFile(configfilePath)
             .Build();
             
             

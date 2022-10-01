@@ -11,3 +11,5 @@ serverinfo:
   serverport: 12345
   rconport: 12345
   rconpassword: RCONPASSWORDHERE
+  receivetimeout: 15
+  sendtimeout: 15

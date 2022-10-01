@@ -15,12 +15,15 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
-    <PackageReference Include="SteamQueryNet" Version="1.0.6" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config.yml">
+    <ProjectReference Include="..\..\SteamQueryNet\SteamQueryNet\SteamQueryNet\SteamQueryNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ExampleConfig.yml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
