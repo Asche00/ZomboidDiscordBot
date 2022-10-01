@@ -23,11 +23,11 @@ namespace ZomboidDiscordBot.Server
         {
             //Get config
             string serverIp = _config["serverinfo:serverip"].ToString();
-            ushort serverport = Convert.ToUInt16(_config["serverinfo:serverport"].ToString());
+            ushort rconport = Convert.ToUInt16(_config["serverinfo:rconport"].ToString());
             string rconpassword = _config["serverinfo:rconpassword"].ToString();
 
             // Connect to a server
-            var rcon = new RCON(IPAddress.Parse(serverIp), serverport, rconpassword);
+            var rcon = new RCON(IPAddress.Parse(serverIp), rconport, rconpassword);
             await rcon.ConnectAsync();
 
             string response = await rcon.SendCommandAsync("quit");

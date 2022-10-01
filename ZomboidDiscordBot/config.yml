@@ -9,4 +9,5 @@ data:
 serverinfo:
   serverip: 192.168.1.1
   serverport: 12345
+  rconport: 12345
   rconpassword: RCONPASSWORDHERE
