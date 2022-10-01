@@ -13,6 +13,7 @@ using SteamQueryNet.Models;
 using Microsoft.Extensions.Hosting;
 using Player = SteamQueryNet.Models.Player;
 using Discord.WebSocket;
+using Discord;
 
 namespace ZomboidDiscordBot.Server
 {
@@ -53,14 +54,14 @@ namespace ZomboidDiscordBot.Server
             }
             catch
             {
-                await _client.SetGameAsync ("Offline");
+                await _client.SetActivityAsync(new Game("Offline")).ConfigureAwait(false);
                 return;
             }
 
             ServerInfo serverInfo = serverQuery.GetServerInfo();
             List<Player> players = serverQuery.GetPlayers();
 
-            await _client.SetGameAsync($"Online - Players: {players.Count()}");
+            await _client.SetActivityAsync(new Game($"Zomboid with {players.Count()} players")).ConfigureAwait(false);
             return;
 
         }
