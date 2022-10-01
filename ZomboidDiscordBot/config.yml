@@ -1,0 +1,12 @@
+testguild: 1234567
+zomboidguild: 1234567
+tokens:
+  discord: DISCORDTOKENHERE
+prefix: 1
+restartcooldown: 30
+data:
+  lastrestart: 01/01/1900 12:00:00 PM
+serverinfo:
+  serverip: 192.168.1.1
+  serverport: 12345
+  rconpassword: RCONPASSWORDHERE
