@@ -9,6 +9,8 @@ using Discord.Commands;
 using Discord;
 using ZomboidDiscordBot.Server;
 using System.IO;
+using System.Runtime.Serialization.Formatters;
+using Microsoft.Extensions.Logging;
 
 namespace ZomboidDiscordBot
 {
@@ -34,8 +36,8 @@ namespace ZomboidDiscordBot
             // I chose using YML files for my config data as I am familiar with them
             .AddYamlFile(configfilePath)
             .Build();
-            
-            
+
+
             using IHost host = Host.CreateDefaultBuilder()
                 .ConfigureServices((_, services) =>
             services
@@ -47,23 +49,24 @@ namespace ZomboidDiscordBot
                 GatewayIntents = Discord.GatewayIntents.AllUnprivileged,
                 LogGatewayIntentWarnings = false,
                 AlwaysDownloadUsers = true,
-                LogLevel = LogSeverity.Info
+                LogLevel = GetLogLevel(),
             }))
-			// Adding console logging
+            // Adding console logging
             .AddTransient<ConsoleLogger>()
             // Used for slash commands and their registration with Discord
             .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
             // Required to subscribe to the various client events used in conjunction with Interactions
             .AddSingleton<InteractionHandler>()
             // Adding the prefix Command Service
+
             .AddSingleton(x => new CommandService(new CommandServiceConfig
             {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = GetLogLevel(),
                 DefaultRunMode = Discord.Commands.RunMode.Async
             }))
             // Adding the prefix command handler
             .AddSingleton<PrefixHandler>()
-            
+
             //Adding ServerUtility
             .AddSingleton<ServerUtility>())
             .Build();
@@ -126,5 +129,19 @@ namespace ZomboidDiscordBot
                 return false;
             #endif
         }
+
+        static Discord.LogSeverity GetLogLevel()
+        {
+            if(IsDebug())
+            {
+                return LogSeverity.Debug;
+            }
+            else
+            {
+                return LogSeverity.Info;
+            }
+        }
+
+
     }
 }
