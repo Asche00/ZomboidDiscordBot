@@ -132,14 +132,16 @@ namespace ZomboidDiscordBot
 
         static Discord.LogSeverity GetLogLevel()
         {
-            if(IsDebug())
-            {
-                return LogSeverity.Debug;
-            }
-            else
-            {
-                return LogSeverity.Info;
-            }
+            //if(IsDebug())
+            //{
+            //    return LogSeverity.Debug;
+            //}
+            //else
+            //{
+            //    return LogSeverity.Info;
+            //}
+
+            return LogSeverity.Info;
         }
 
 
