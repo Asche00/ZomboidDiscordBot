@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration.Yaml;
 using Discord.Commands;
 using Discord;
 using ZomboidDiscordBot.Server;
+using System.IO;
+using System.Runtime.Serialization.Formatters;
+using Microsoft.Extensions.Logging;
 
 namespace ZomboidDiscordBot
 {
@@ -21,14 +24,20 @@ namespace ZomboidDiscordBot
 
         public async Task MainAsync()
         {
+            //We'll use the roaming directory for ease of use.
+            string configfilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZomboidBot");
+            if (!Directory.Exists(configfilePath))
+                Directory.CreateDirectory(configfilePath);
+            configfilePath = Path.Combine(configfilePath, "config.yml");
+
             var config = new ConfigurationBuilder()
             // this will be used more later on
             .SetBasePath(AppContext.BaseDirectory)
             // I chose using YML files for my config data as I am familiar with them
-            .AddYamlFile("config.yml")
+            .AddYamlFile(configfilePath)
             .Build();
-            
-            
+
+
             using IHost host = Host.CreateDefaultBuilder()
                 .ConfigureServices((_, services) =>
             services
@@ -40,23 +49,24 @@ namespace ZomboidDiscordBot
                 GatewayIntents = Discord.GatewayIntents.AllUnprivileged,
                 LogGatewayIntentWarnings = false,
                 AlwaysDownloadUsers = true,
-                LogLevel = LogSeverity.Info
+                LogLevel = GetLogLevel(),
             }))
-			// Adding console logging
+            // Adding console logging
             .AddTransient<ConsoleLogger>()
             // Used for slash commands and their registration with Discord
             .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
             // Required to subscribe to the various client events used in conjunction with Interactions
             .AddSingleton<InteractionHandler>()
             // Adding the prefix Command Service
+
             .AddSingleton(x => new CommandService(new CommandServiceConfig
             {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = GetLogLevel(),
                 DefaultRunMode = Discord.Commands.RunMode.Async
             }))
             // Adding the prefix command handler
             .AddSingleton<PrefixHandler>()
-            
+
             //Adding ServerUtility
             .AddSingleton<ServerUtility>())
             .Build();
@@ -84,6 +94,7 @@ namespace ZomboidDiscordBot
             _client.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
             // Subscribe to slash command log events
             commands.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
+            _ = HandleStatus(provider);
 
             _client.Ready += async () =>
             {
@@ -103,13 +114,36 @@ namespace ZomboidDiscordBot
             await Task.Delay(-1);
         }
 
-        static bool IsDebug()
+
+        private async Task HandleStatus(IServiceProvider provider)
         {
-#if DEBUG
-            return true;
-#else
-            return false;
-#endif
+            ServerUtility serverUtility = provider.GetRequiredService<ServerUtility>();
+            serverUtility.QueryServerInfo();
         }
+
+            static bool IsDebug()
+        {
+            #if DEBUG
+                return true;
+            #else
+                return false;
+            #endif
+        }
+
+        static Discord.LogSeverity GetLogLevel()
+        {
+            //if(IsDebug())
+            //{
+            //    return LogSeverity.Debug;
+            //}
+            //else
+            //{
+            //    return LogSeverity.Info;
+            //}
+
+            return LogSeverity.Info;
+        }
+
+
     }
 }

@@ -2,9 +2,11 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualBasic;
 using System.Reflection;
+using ZomboidDiscordBot.Server;
 
 namespace ZomboidDiscordBot
 {
@@ -89,11 +91,25 @@ namespace ZomboidDiscordBot
                 //Server restart button
                 if (parsedArg.Data.CustomId == "restart-yes")
                 {
-                    await parsedArg.UpdateAsync(x =>
+                    var ServerUtil = _services.GetRequiredService<ServerUtility>();
+
+                    if (ServerUtil.GetPlayerCount() > 0)
                     {
-                        x.Content = "Server restart command sent. Please wait for the server to come online again.";
-                        x.Components = null;
-                    });
+                        await parsedArg.UpdateAsync(x =>
+                        {
+                            x.Content = "There are currently players online. Restart will occur five minutes from now.";
+                            x.Components = null;
+                        });
+                    }
+                    else
+                    {
+
+                        await parsedArg.UpdateAsync(x =>
+                        {
+                            x.Content = "Server restart command sent. Please wait for the server to come online again.";
+                            x.Components = null;
+                        });
+                    }
                 }
 
                 //Server restart button cancel

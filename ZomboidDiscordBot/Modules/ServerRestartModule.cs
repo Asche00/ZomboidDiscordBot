@@ -49,7 +49,7 @@ namespace ZomboidDiscordBot
             //If we restarted recently, do not give the option.
             if (lastRestartMinutes < _restartCooldown)
             {
-                await RespondAsync($"The server was restarted {lastRestartMinutes} minutes ago. Please wait {_restartCooldown} minutes between restarts.", ephemeral: true);
+                await RespondAsync($"Server restart was requested {lastRestartMinutes} minutes ago. Please wait {_restartCooldown} minutes between restart requests.", ephemeral: true);
                 return;
             }
 
@@ -64,24 +64,37 @@ namespace ZomboidDiscordBot
         [ComponentInteraction("restart-yes")]
         public async Task RestartYesHandler()
         {
-            //Do RCON stuff here
             var ServerUtil = _services.GetRequiredService<ServerUtility>();
-            await ServerUtil.RestartServerRcon();
 
+            //If there are players online, delay the restart.
+            if (ServerUtil.GetPlayerCount() > 0)
+            {
+                ServerUtil.HandleDelayedRestart();
+            }
+            else
+            {
+                //Do RCON stuff here
+                ServerUtil.RestartServerRcon();
+            }
 
             //Save to config file for application restarts
-            var path = "config.yml";
+            //This might cause a problem if the server doesn't actually restart for some reason
+            //but manual intervention would likely be needed in this case anyway.
+            string configfilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZomboidBot");
+            configfilePath = Path.Combine(configfilePath, "config.yml");
+
             var deserializer = new YamlDotNet.Serialization.Deserializer();
 
-            using var reader = new StreamReader(path);
+            using var reader = new StreamReader(configfilePath);
             var obj = deserializer.Deserialize<Dictionary<object, object>>(reader);
             var data = (Dictionary<object, object>)obj["data"];
             reader.Close();
 
             data["lastrestart"] = DateTime.Now.ToString();
+            data["restartuser"] = Context.User.Username;
 
             //save changes
-            using var writer = new StreamWriter(path);
+            using var writer = new StreamWriter(configfilePath);
             var serializer = new YamlDotNet.Serialization.Serializer();
             serializer.Serialize(writer, obj);
             writer.Close();

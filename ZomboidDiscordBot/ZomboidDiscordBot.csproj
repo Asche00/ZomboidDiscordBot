@@ -19,8 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <ProjectReference Include="..\..\SteamQueryNet\SteamQueryNet\SteamQueryNet\SteamQueryNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ExampleConfig.yml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
