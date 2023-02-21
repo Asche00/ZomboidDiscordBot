@@ -84,6 +84,7 @@ namespace ZomboidDiscordBot
 
         private async Task HandleComponent(SocketInteraction arg)
         {
+            bool msgUpated = false;
             try
             {
                 var parsedArg = (SocketMessageComponent) arg;
@@ -99,6 +100,7 @@ namespace ZomboidDiscordBot
                         {
                             x.Content = "There are currently players online. Restart will occur five minutes from now.";
                             x.Components = null;
+                            msgUpated = true;
                         });
                     }
                     else
@@ -108,6 +110,7 @@ namespace ZomboidDiscordBot
                         {
                             x.Content = "Server restart command sent. Please wait for the server to come online again.";
                             x.Components = null;
+                            msgUpated = true;
                         });
                     }
                 }
@@ -119,6 +122,7 @@ namespace ZomboidDiscordBot
                     {
                         x.Content = "Restart cancelled.";
                         x.Components = null;
+                        msgUpated = true;
                     });
                 }
 
@@ -132,7 +136,8 @@ namespace ZomboidDiscordBot
 
                 // If a Slash Command execution fails it is most likely that the original interaction acknowledgement will persist. It is a good idea to delete the original
                 // response, or at least let the user know that something went wrong during the command execution.
-                if (arg.Type == InteractionType.MessageComponent)
+                // If this is true, we've updated something already, so don't delete it.
+                if (arg.Type == InteractionType.MessageComponent && msgUpated == false)
                     await arg.GetOriginalResponseAsync().ContinueWith(async (msg) => await msg.Result.DeleteAsync());
             }
         }
