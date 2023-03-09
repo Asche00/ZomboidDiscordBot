@@ -6,5 +6,6 @@ namespace ZomboidDiscordBot.Server
     {
         public static ZomboidTypeServerState.ServerState ServerState = ZomboidTypeServerState.ServerState.Offline;
         public static int PlayerCount = 0;
+        public static bool IsDebugServer = false;
     }
 }
