@@ -16,6 +16,7 @@ using Discord.WebSocket;
 using Discord;
 using Microsoft.Extensions.Logging;
 using YamlDotNet.Serialization;
+using ZomboidTypesLibrary;
 
 namespace ZomboidDiscordBot.Server
 {

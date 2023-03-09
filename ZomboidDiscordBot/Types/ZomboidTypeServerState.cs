@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace ZomboidTypesLibrary
 {
-    public partial class ServerTypeServerState
+    public partial class ZomboidTypeServerState
     {
         //Enums
         public enum ServerState
