@@ -96,10 +96,12 @@ namespace ZomboidDiscordBot
             commands.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
             _ = HandleStatus(provider);
 
+            ServerInfo.IsDebugServer = bool.Parse(config["debug"]);
+
             _client.Ready += async () =>
             {
                 // If running the bot with DEBUG flag, register all commands to guild specified in config
-                if (IsDebug())
+                if (ServerInfo.IsDebugServer)
                     // Id of the test guild can be provided from the Configuration object
                     await commands.RegisterCommandsToGuildAsync(UInt64.Parse(config["testGuild"]), true);
                 else
@@ -119,15 +121,6 @@ namespace ZomboidDiscordBot
         {
             ServerUtility serverUtility = provider.GetRequiredService<ServerUtility>();
             serverUtility.QueryServerInfo();
-        }
-
-            static bool IsDebug()
-        {
-            #if DEBUG
-                return true;
-            #else
-                return false;
-            #endif
         }
 
         static Discord.LogSeverity GetLogLevel()
