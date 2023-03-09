@@ -1,5 +1,6 @@
 testguild: 1234567
 zomboidguild: 1234567
+debug: false
 tokens:
   discord: DISCORDTOKENHERE
 prefix: 1
