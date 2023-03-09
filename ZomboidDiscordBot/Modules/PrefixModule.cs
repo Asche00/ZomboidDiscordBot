@@ -11,11 +11,11 @@ namespace ZomboidDiscordBot.Modules
     // this Module name, PrefixModule, will be called by AddModule when loading the bot with the available prefix commands
     public class PrefixModule : ModuleBase<SocketCommandContext>
     {
-        [Command("ping")]
-        public async Task Pong()
-        {
-            // Reply to the user's message with the response
-            await Context.Message.ReplyAsync("Pong!");
-        }
+        //[Command("ping")]
+        //public async Task Pong()
+        //{
+        //    // Reply to the user's message with the response
+        //    await Context.Message.ReplyAsync("Pong!");
+        //}
     }
 }
